@@ -2,6 +2,8 @@
 #include<conio.h>
 #include <windows.h>
 #include<iostream>
+#include <mmsystem.h>
+#pragma comment(lib, "winmm.lib")
 using namespace std;
 
 const int WIDTH = 600;
@@ -22,7 +24,7 @@ IMAGE imgCharacterSelect;
 
 bool isleft = false;
 int score = 0;
-int selectedCharacter = 1; // ³õÊ¼Ñ¡ÔñµÚÒ»¸ö½ÇÉ«
+int selectedCharacter = 1; // åˆå§‹é€‰æ‹©ç¬¬ä¸€ä¸ªè§’è‰²
 
 struct platform {
     int x, y;
@@ -90,12 +92,12 @@ void showCharacterSelectScreen() {
     loadimage(&imgCharacterSelect, L"tietu/character_select.jpg");
     putimage(0, 0, &imgCharacterSelect);
 
-    // ÏÔÊ¾½ÇÉ«Í¼Æ¬
+    // æ˜¾ç¤ºè§’è‰²å›¾ç‰‡
     putimagePNG(WIDTH / 6 - PLAYER_SIZE / 2, HEIGHT / 2 - PLAYER_SIZE / 2, &imgplayer1_right);
     putimagePNG(3 * WIDTH / 6 - PLAYER_SIZE / 2, HEIGHT / 2 - PLAYER_SIZE / 2, &imgplayer2_right);
     putimagePNG(5 * WIDTH / 6 - PLAYER_SIZE / 2, HEIGHT / 2 - PLAYER_SIZE / 2, &imgplayer3_right);
 
-    // µÈ´ıÍæ¼ÒÑ¡Ôñ½ÇÉ«
+    // ç­‰å¾…ç©å®¶é€‰æ‹©è§’è‰²
     while (true) {
         if (GetAsyncKeyState('1')) {
             selectedCharacter = 1;
@@ -117,7 +119,7 @@ void showCharacterSelectScreen() {
 
 void initialize() {
     
-    settextstyle(24, 0, _T("Î¢ÈíÑÅºÚ"));
+    settextstyle(24, 0, _T("å¾®è½¯é›…é»‘"));
     settextcolor(BLACK);
     setbkmode(TRANSPARENT);
     loadimage(&imgbackground, L"tietu/beijing.jpg");
@@ -138,6 +140,9 @@ void initialize() {
             false
         };
     }
+    
+    mciSendString(L"open \"music.wav\" type waveaudio alias bgm", NULL, 0, NULL);
+    mciSendString(L"play bgm repeat", NULL, 0, NULL);
 }
 
 void draw() {
@@ -160,7 +165,7 @@ void draw() {
     putimagePNG(person.x - PLAYER_SIZE / 2, person.y - PLAYER_SIZE / 2, currentImage);
 
     TCHAR scoreText[20];
-    _stprintf_s(scoreText, _T("·ÖÊı:%d"), score);
+    _stprintf_s(scoreText, _T("åˆ†æ•°:%d"), score);
     outtextxy(10, 10, scoreText);
     Sleep(10);
 }
@@ -215,6 +220,16 @@ int main()
     showCharacterSelectScreen();
     initialize();
 
+    while (!_kbhit()) {
+        update();
+        draw();
+    }
+    mciSendString(L"stop bgm", NULL, 0, NULL);
+    mciSendString(L"close bgm", NULL, 0, NULL);
+
+    closegraph();
+    return 0;
+}
     while (!_kbhit()) {
         update();
         draw();
